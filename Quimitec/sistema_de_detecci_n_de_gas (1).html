@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Detección de Fugas de Gas - Dashboard Interactivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Industrial Clean & Alert (Fondo crema muy claro, acentos en rojo seguridad y verde éxito) -->
+    <style>
+        :root {
+            --bg-main: #fdfbf7;
+            --accent-red: #ef4444;
+            --accent-green: #22c55e;
+            --text-dark: #1e293b;
+        }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        .section-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .status-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Google Tag Manager (noscript) -->
+    -->
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <span class="font-bold text-slate-800 tracking-tight">GAS-GUARD MQ-2</span>
+            <div class="hidden md:flex space-x-6 text-sm font-medium text-slate-600">
+                <a href="#problema" class="hover:text-red-500 transition">Problema</a>
+                <a href="#quimica" class="hover:text-red-500 transition">Química</a>
+                <a href="#simulador" class="hover:text-red-500 transition">Simulador</a>
+                <a href="#hardware" class="hover:text-red-500 transition">Hardware</a>
+                <a href="#validacion" class="hover:text-red-500 transition">Validación</a>
+            </div>
+            <button onclick="document.getElementById('simulador').scrollIntoView()" class="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg hover:bg-red-600 transition">Probar Sensor</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="problema" class="max-w-6xl mx-auto px-4 py-16 text-center">
+        <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6">Prevención de Fugas de Gas en Tiempo Real</h1>
+        <p class="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            Las fugas domésticas son riesgos silenciosos. Este proyecto utiliza la química de semiconductores y la computación embebida para crear un entorno seguro mediante alertas tempranas.
+        </p>
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="text-red-500 text-2xl mb-2">⚠</div>
+                <h3 class="font-bold mb-2">Riesgo Crítico</h3>
+                <p class="text-sm text-slate-500">Invisibilidad del gas LP y monóxido en concentraciones bajas pero peligrosas.</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="text-blue-500 text-2xl mb-2">⚙</div>
+                <h3 class="font-bold mb-2">Tecnología MQ-2</h3>
+                <p class="text-sm text-slate-500">Detección selectiva de GLP, Metano, Butano y Humo mediante SnO₂.</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="text-green-500 text-2xl mb-2">✔</div>
+                <h3 class="font-bold mb-2">Alerta Activa</h3>
+                <p class="text-sm text-slate-500">Buzzer y LEDs de alta intensidad para respuesta inmediata bajo 500ms.</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Química del Sensor -->
+    <section id="quimica" class="bg-slate-900 text-white py-20">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-8">Fundamento Químico: Redox en el Sensor</h2>
+            <p class="text-slate-400 mb-12 max-w-2xl">
+                Esta sección explica cómo el dióxido de estaño (SnO₂) reacciona a nivel molecular. En aire limpio, el oxígeno se absorbe y crea una alta resistencia. Ante el gas, ocurre una reducción que libera electrones.
+            </p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="bg-slate-800 p-6 rounded-xl border-l-4 border-blue-500">
+                        <h4 class="font-bold text-blue-400 mb-2 uppercase text-xs tracking-widest">Reacción Simplificada</h4>
+                        <p class="font-mono text-lg">Gas (R) + O₂⁻ (ads) → RO₂ + e⁻</p>
+                        <p class="text-sm text-slate-400 mt-2">La liberación de electrones aumenta la conductividad medible por el Arduino.</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-xl border-l-4 border-yellow-500">
+                        <h4 class="font-bold text-yellow-400 mb-2 uppercase text-xs tracking-widest">Cinética Química</h4>
+                        <ul class="text-sm text-slate-400 space-y-2">
+                            <li>• <strong>Concentración:</strong> A mayor gas, mayor velocidad de reacción.</li>
+                            <li>• <strong>Temperatura:</strong> Factor crítico para la sensibilidad del calentador interno.</li>
+                            <li>• <strong>Humedad:</strong> Variable controlada para evitar falsos positivos.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <img src="c:\Users\corad\Downloads\Quimitec\schematic-768x410.png" alt="Esquema del sensor" class="rounded-lg shadow-2xl max-w-full h-auto border border-slate-700">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Simulador de Tiempo Real -->
+    <section id="simulador" class="py-20">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-900">Simulador de Laboratorio</h2>
+                <p class="text-slate-600 mt-2">Interactúa con el experimento para observar la respuesta cinética del sensor MQ-2.</p>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Controles -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-4">Inyectar Muestra de Gas</label>
+                            <div class="grid grid-cols-1 gap-3">
+                                <button onclick="simularGas(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-800 p-3 rounded-xl transition flex justify-between items-center">
+                                    <span>Fuga Leve (1s)</span>
+                                    <span class="text-xs bg-slate-300 px-2 py-1 rounded">Bajo</span>
+                                </button>
+                                <button onclick="simularGas(3)" class="bg-orange-100 hover:bg-orange-200 text-orange-800 p-3 rounded-xl transition flex justify-between items-center">
+                                    <span>Fuga Moderada (3s)</span>
+                                    <span class="text-xs bg-orange-300 px-2 py-1 rounded">Medio</span>
+                                </button>
+                                <button onclick="simularGas(6)" class="bg-red-100 hover:bg-red-200 text-red-800 p-3 rounded-xl transition flex justify-between items-center font-bold">
+                                    <span>Fuga Crítica (6s)</span>
+                                    <span class="text-xs bg-red-300 px-2 py-1 rounded">ALTO</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="statusPanel" class="p-6 bg-slate-50 rounded-2xl text-center">
+                            <span class="text-xs uppercase font-bold text-slate-400 block mb-1">Estado del Sistema</span>
+                            <div id="statusText" class="text-2xl font-black text-green-500 uppercase">Seguro</div>
+                            <div id="statusValue" class="text-4xl font-mono mt-2">300 <span class="text-sm">ppm</span></div>
+                        </div>
+                        <button onclick="resetSimulador()" class="w-full py-2 text-slate-400 text-sm hover:text-slate-600 underline">Reiniciar experimento</button>
+                    </div>
+
+                    <!-- Gráfico -->
+                    <div class="lg:col-span-2">
+                        <div class="chart-container">
+                            <canvas id="gasChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hardware y Conexiones -->
+    <section id="hardware" class="bg-slate-50 py-20">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-4">Hardware y Arquitectura</h2>
+            <p class="text-slate-600 mb-12">El diseño integra un microcontrolador ATmega328P para procesar la señal analógica y convertirla en una respuesta digital inmediata.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <span class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mr-3 text-sm">1</span>
+                        Diagrama de Conexión
+                    </h3>
+                    <img src="c:\Users\corad\Downloads\Quimitec\mq2-gas-sensor-backside-1.png" alt="Conexión Arduino MQ-2" class="rounded-xl shadow-md w-full border border-slate-200">
+                    <p class="text-xs text-slate-500 italic text-center">Referencia de cableado: VCC (5V), GND, A0 (Señal).</p>
+                </div>
+                <div class="space-y-6">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <span class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mr-3 text-sm">2</span>
+                        Lista de Materiales
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-white rounded-lg shadow-sm border border-slate-200">
+                            <span class="block font-bold">Arduino Uno</span>
+                            <span class="text-xs text-slate-400">Microcontrolador</span>
+                        </div>
+                        <div class="p-4 bg-white rounded-lg shadow-sm border border-slate-200">
+                            <span class="block font-bold">Sensor MQ-2</span>
+                            <span class="text-xs text-slate-400">Detección de gas</span>
+                        </div>
+                        <div class="p-4 bg-white rounded-lg shadow-sm border border-slate-200">
+                            <span class="block font-bold">Piezo Buzzer</span>
+                            <span class="text-xs text-slate-400">Alerta sonora</span>
+                        </div>
+                        <div class="p-4 bg-white rounded-lg shadow-sm border border-slate-200">
+                            <span class="block font-bold">Protoboard</span>
+                            <span class="text-xs text-slate-400">Interconexión</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900 text-white p-6 rounded-xl overflow-hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-xs font-mono text-slate-400">logic_main.ino</span>
+                            <span class="w-3 h-3 rounded-full bg-red-400"></span>
+                        </div>
+                        <pre class="text-[10px] md:text-xs font-mono leading-relaxed">
+int sensorPin = A0;
+void loop() {
+  int val = analogRead(sensorPin);
+  if(val > 400) {
+    digitalWrite(buzzer, HIGH);
+    Serial.println("ALERTA!");
+  }
+  delay(500);
+}
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Validación y Calibración -->
+    <section id="validacion" class="py-20">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+                <div>
+                    <h2 class="text-3xl font-bold">Validación y Coeficiente R²</h2>
+                    <p class="text-slate-600 mt-2">Para asegurar la precisión, el sensor se somete a una prueba de linealidad.</p>
+                </div>
+                <div class="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold text-sm">
+                    Meta: R² > 0.95 (Alta Correlación)
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+                    <h4 class="font-bold mb-6">Protocolo de Repetibilidad</h4>
+                    <table class="w-full text-left text-sm">
+                        <thead class="border-b border-slate-100">
+                            <tr>
+                                <th class="pb-3 text-slate-400 font-medium">Prueba</th>
+                                <th class="pb-3 text-slate-400 font-medium">Concentración (s)</th>
+                                <th class="pb-3 text-slate-400 font-medium">Lectura (ADC)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-slate-600">
+                            <tr class="border-b border-slate-50"><td class="py-3">P-01</td><td class="py-3">1s</td><td class="py-3">320</td></tr>
+                            <tr class="border-b border-slate-50"><td class="py-3">P-02</td><td class="py-3">1s</td><td class="py-3">325</td></tr>
+                            <tr class="border-b border-slate-50"><td class="py-3">P-03</td><td class="py-3">3s</td><td class="py-3">610</td></tr>
+                            <tr class="border-b border-slate-50"><td class="py-3">P-04</td><td class="py-3">3s</td><td class="py-3">615</td></tr>
+                            <tr><td class="py-3">P-05</td><td class="py-3">Aire</td><td class="py-3">180</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-slate-900 text-white p-8 rounded-2xl">
+                        <h4 class="font-bold mb-4">Cálculo de Pendiente Cinética</h4>
+                        <p class="text-slate-400 text-sm mb-6">El sistema no solo lee valores fijos, sino que calcula la velocidad de cambio para anticipar fugas súbitas.</p>
+                        <div class="flex justify-center bg-slate-800 p-6 rounded-xl font-serif text-2xl italic">
+                            V = (L₂ - L₁) / (t₂ - t₁)
+                        </div>
+                        <p class="text-xs text-center text-slate-500 mt-4">Donde V es la pendiente de respuesta del sensor.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-100 py-16 border-t border-slate-200">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-4 uppercase text-sm tracking-widest">Protocolo Experimental</h3>
+                    <ul class="space-y-3 text-slate-600 text-sm">
+                        <li class="flex items-center"><span class="mr-2">1.</span> Precalentado del sensor (2 min).</li>
+                        <li class="flex items-center"><span class="mr-2">2.</span> Toma de valor base en aire limpio.</li>
+                        <li class="flex items-center"><span class="mr-2">3.</span> Liberación controlada de gas LP.</li>
+                        <li class="flex items-center"><span class="mr-2">4.</span> Ventilación de la maqueta tras cada prueba.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                    <h3 class="font-bold text-red-600 mb-4 flex items-center">
+                        <span class="mr-2">🛡</span> Seguridad Primero
+                    </h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">
+                        Trabajar siempre en áreas ventiladas. El sensor MQ-2 opera mediante un elemento calefactor que puede alcanzar temperaturas altas. Desconectar la alimentación de 5V tras finalizar el registro de datos.
+                    </p>
+                </div>
+            </div>
+            <div class="mt-8 flex flex-col items-center justify-center border-t border-slate-200 pt-8">
+            <h3 class="text-sm font-semibold text-slate-600 mb-4">Video Demostrativo: Funcionamiento del Sensor MQ-2</h3>
+            <div class="w-full max-w-2xl aspect-video rounded-lg overflow-hidden shadow-md">
+                <iframe 
+                    class="w-full h-full" 
+                    src="https://www.youtube.com/embed/YekPN1J9dZw" 
+                    title="How TO USE MQ2 GAS SENSOR WITH ARDUINO FOR SMOKE DETECTION" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+            <div class="text-center text-slate-400 text-xs border-t border-slate-200 pt-8">
+                &copy; 2026 Proyecto Detección de Gas - Equipo Arduino-Química
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        /*  
+           1. Gráfico de Líneas (Chart.js): Elegido para mostrar la cinética de respuesta (PPM vs Tiempo). Permite ver visualmente cómo la "Velocidad de Reacción" descrita en el reporte se traduce en una pendiente pronunciada.
+           2. Panel de Estado: Actualiza colores y texto en tiempo real para simular la lógica de alerta del código Arduino.
+           3. Botones de Simulación: Permiten al usuario inyectar "gas virtual" de diferentes duraciones para validar la hipótesis de mayor concentración = mayor respuesta.
+        */
+        
+        let chart;
+        let timeLabels = Array.from({length: 20}, (_, i) => i + "s");
+        let currentData = Array(20).fill(180); // Base level
+        let timer = null;
+
+        function initChart() {
+            const ctx = document.getElementById('gasChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeLabels,
+                    datasets: [{
+                        label: 'Concentración de Gas (Lectura ADC)',
+                        data: currentData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 1024,
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function updateUI(value) {
+            const statusText = document.getElementById('statusText');
+            const statusValue = document.getElementById('statusValue');
+            const panel = document.getElementById('statusPanel');
+
+            statusValue.innerHTML = `${Math.round(value)} <span class="text-sm">ADC</span>`;
+
+            if (value > 600) {
+                statusText.innerText = "¡PELIGRO!";
+                statusText.className = "text-2xl font-black text-red-600 uppercase status-pulse";
+                panel.className = "p-6 bg-red-50 rounded-2xl text-center border-2 border-red-200";
+            } else if (value > 400) {
+                statusText.innerText = "PRECAUCIÓN";
+                statusText.className = "text-2xl font-black text-orange-500 uppercase";
+                panel.className = "p-6 bg-orange-50 rounded-2xl text-center border-2 border-orange-100";
+            } else {
+                statusText.innerText = "SEGURO";
+                statusText.className = "text-2xl font-black text-green-500 uppercase";
+                panel.className = "p-6 bg-slate-50 rounded-2xl text-center";
+            }
+        }
+
+        function simularGas(segundos) {
+            if(timer) clearInterval(timer);
+            
+            let count = 0;
+            const peak = 300 + (segundos * 100);
+            
+            timer = setInterval(() => {
+                count++;
+                
+                // Efecto de subida y bajada 
+                let newValue;
+                if (count < 5) {
+                    newValue = currentData[currentData.length - 1] + (peak / 5);
+                } else {
+                    newValue = currentData[currentData.length - 1] * 0.85;
+                    if (newValue < 180) {
+                        newValue = 180 + Math.random() * 10;
+                        clearInterval(timer);
+                    }
+                }
+
+                currentData.push(newValue);
+                currentData.shift();
+                
+                chart.update();
+                updateUI(newValue);
+                
+                if (count > 20) clearInterval(timer);
+            }, 300);
+        }
+
+        function resetSimulador() {
+            currentData = Array(20).fill(180);
+            chart.update();
+            updateUI(180);
+        }
+
+        window.onload = initChart;
+    </script>
+    
+</body>
+</html>
